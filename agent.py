@@ -14,7 +14,7 @@ def MT(board: Board) -> int:
             if board.state[i][j] != 0:
                 x, y = np.where(board.solution == board.state[i][j])
                 h += abs(i - x) + abs(j - y)
-    return h    
+    return h 
 
 
 def CB(board: Board) -> int:
@@ -28,18 +28,26 @@ A* Search
 '''
 def a_star_search(board: Board, heuristic: Callable[[Board], int]):
     frontier = PriorityQueue()
-    frontier.put((heuristic(board), board, []))
+    frontier.put((heuristic(board), board))
     visited = set()
 
     while not frontier.empty():
-        f, state, path = frontier.get()
-        if state.goal_test():
-            return path
-        for neighbor, action in state.get_successors():
-            if neighbor not in visited:
-                g = len(path) + 1
-                h = heuristic(neighbor)
-                f = g + h
-                frontier.put((f, neighbor, path + [action]))
+        _, current_state = frontier.get()
+
+        if current_state.goal_test():
+            return current_state.path
+        visited.add(current_state)
+
+        next_states = current_state.next_action_states()
+        for next_state, action in next_states:
+            if str(next_state) not in visited:
+                # Calculate the cost of the next state
+                cost = current_state.g + 1 + heuristic(next_state)
+                
+                # Add the next state to the frontier
+                frontier.put((cost, next_state))
+                
+                # Update the cost of the next state
+                next_state.g = current_state.g + 1
 
     return None

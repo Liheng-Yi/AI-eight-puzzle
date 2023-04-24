@@ -16,6 +16,7 @@ class Board:
             random.seed(seed)
         self._shuffle(m)
         self.initial_state = np.copy(self.state)
+        self.g = 0
 
     '''
     This function returns a list of tuples containing possible next states and the move direction that created that state
@@ -100,3 +101,11 @@ class Board:
     '''
     def __str__(self):
         return str(self.state)
+    
+    def get_successors(self) -> List[Tuple[Board, str]]:
+        successors = []
+        for move, direction in self._possible_moves():
+            new_state = copy.deepcopy(self)
+            new_state._move(move)
+            successors.append((new_state, direction))
+        return successors

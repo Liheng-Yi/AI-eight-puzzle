@@ -17,6 +17,7 @@ def main():
             ***********************************************
             '''
             solution = a_star_search(board, MT)
+            
             end =  time.process_time()
             solution_cpu_time = end-start
 
