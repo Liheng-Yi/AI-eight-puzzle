@@ -5,7 +5,7 @@ from agent import MT, a_star_search
 
 def main():
 
-    for m in [10,20,30,40,50]:
+    for m in [10]:
         for seed in range(0,10):
             # Sets the seed of the problem so all students solve the same problems
             board = Board(m, seed)

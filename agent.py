@@ -35,7 +35,11 @@ def a_star_search(board: Board, heuristic: Callable[[Board], int]):
         _, current_state = frontier.get()
 
         if current_state.goal_test():
-            return
+
+            return current_state.total_action
+        
+
+
         visited.add(current_state)
 
         next_states = current_state.next_action_states()
@@ -44,11 +48,14 @@ def a_star_search(board: Board, heuristic: Callable[[Board], int]):
                 # Calculate the cost of the next state
                 cost = current_state.g + 1 + heuristic(next_state)
                 print("cost:",cost)
+                print("action:", action)
                 print("next_state:\n",next_state)
                 # Add the next state to the frontier
                 frontier.put((cost, next_state))
                 
                 # Update the cost of the next state
                 next_state.g = current_state.g + 1
+                # append action
+                next_state.total_action.append(action)
 
     return None

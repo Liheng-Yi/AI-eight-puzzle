@@ -17,6 +17,7 @@ class Board:
         self._shuffle(m)
         self.initial_state = np.copy(self.state)
         self.g = 0
+        self.total_action = []
 
     '''
     This function returns a list of tuples containing possible next states and the move direction that created that state
