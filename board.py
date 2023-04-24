@@ -109,3 +109,7 @@ class Board:
             new_state._move(move)
             successors.append((new_state, direction))
         return successors
+    
+    # As long as there is a comparesion, let the self less than the other one
+    def __lt__(self, other: Board) -> bool:
+        return True
