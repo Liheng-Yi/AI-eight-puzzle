@@ -24,7 +24,13 @@ def CB(board: Board) -> int:
 
 
 def NA(board: Board) -> int:
-    return
+    h = 0
+    for i in range(3):
+        for j in range(3):
+            if board.state[i][j] != 0 and board.state[i][j] != board.solution[i][j]:
+                h += 1
+    return h
+
 
 
 '''
@@ -37,12 +43,13 @@ def a_star_search(board: Board, heuristic: Callable[[Board], int]):
     frontier.put((heuristic(board), board))
     visited = set()
 
-    times = 10
+    #times = 100
 
-    while not frontier.empty() and times > 0:
+    while not frontier.empty():# and times > 0:
         _, current_state = frontier.get()
         # print("intitial: \n", current_state.initial_state)
         # print("current_state: \n", current_state.state,"\n")
+
 
         if current_state.check_solution(current_state.total_action):
             print("we got this!!!!!!!!!!!, \n current map:\n", current_state)
@@ -57,6 +64,11 @@ def a_star_search(board: Board, heuristic: Callable[[Board], int]):
         print("current cost", current_state.g)
         for next_state, action in next_states:
 
+            if tuple(map(tuple, current_state.state)) == tuple(map(tuple, current_state.solution)):
+                print(tuple(map(tuple, current_state.state)))
+                print(tuple(map(tuple, current_state.solution)))
+                print("we got this ????")
+                return current_state.total_action
 
             if tuple(map(tuple, next_state.state)) not in visited:
                 # Calculate the cost of the next state
@@ -77,6 +89,6 @@ def a_star_search(board: Board, heuristic: Callable[[Board], int]):
                 # append action
                 next_state.total_action.append(action)
 
-        times = times - 1
+        #times = times - 1
 
     return None
