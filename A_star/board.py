@@ -17,7 +17,7 @@ class Board:
         self._shuffle(m)
         self.initial_state = np.copy(self.state)
         self.g = 0
-        
+        self.nodes = 0
         self.total_action = []
 
     '''
