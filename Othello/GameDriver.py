@@ -3,6 +3,8 @@ import sys
 import OthelloBoard
 
 
+
+
 class GameDriver:
     def __init__(self, p1type="human", p2type="alphabeta", num_rows=4, num_cols=4, p1_eval_type=0, p1_prune=False, p2_eval_type=0, p2_prune=False, p1_depth=8, p2_depth=8):
         if p1type.lower() in "human":
@@ -35,10 +37,16 @@ class GameDriver:
     def process_move(self, curr_player, opponent):
         invalid_move = True
         while(invalid_move):
-            (col, row) = curr_player.get_move(self.board)
-            if( not self.board.is_legal_move(col, row, curr_player.symbol)):
+
+            tem = curr_player.get_move(self.board)
+
+            # if( not self.board.is_legal_move(col, row, curr_player.symbol)):
+            #     print("Invalid move")
+            if(tem is None):
                 print("Invalid move")
+                return
             else:
+                (col, row) = tem
                 print("Move:", [col,row], "\n")
                 self.board.play_move(col,row,curr_player.symbol)
                 return
