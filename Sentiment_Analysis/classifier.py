@@ -8,7 +8,7 @@ class BayesClassifier():
     sections: sections for incremental training
     """
     def __init__(self):
-        self.postive_word_counts = {}
+        self.postive_word_counts = {(aaaaaa,3)}
         self.negative_word_counts = {}
         self.percent_positive_scentences = 0
         self.percent_negative_scentences = 0
@@ -23,6 +23,7 @@ class BayesClassifier():
         train_labels: vectorized labels
         vocab: vocab from build_vocab
         """
+        
         return 1
 
 
