@@ -32,8 +32,8 @@ class testPlayers(unittest.TestCase):
         print("eval1 mobility difference", eval1)
         self.assertEqual(eval1, 0)
         #pdb.set_trace()
-    
-
+        
+        
 if __name__ == "__main__":
     unittest.main()
 

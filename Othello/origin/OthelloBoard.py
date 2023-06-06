@@ -95,7 +95,7 @@ class OthelloBoard(Board):
         pieces_flipped = 0
         if(not self.is_in_bounds(col, row)):
             print("Flip Pieces bad params.")
-            exit();     
+            exit();
         for d in Direction:
             (next_col, next_row) = self.set_coords_in_direction(col,row,d)
             if(self.check_endpoint(next_col, next_row, symbol, d, False)):
