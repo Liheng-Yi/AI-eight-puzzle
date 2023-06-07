@@ -1,6 +1,7 @@
 # CS331 Sentiment Analysis Assignment 3
 # This file contains the processing functions
 import string
+import classifier
 
 def process_text(text):
     text = text.lower()
@@ -12,6 +13,7 @@ def process_text(text):
         else:
             preprocessed_text += ""
     preprocessed_text = preprocessed_text.split()
+
     return preprocessed_text
 
 
@@ -29,6 +31,7 @@ def build_vocab(preprocessed_text):
 
     # Sort the vocabulary
     vocab.sort()
+    vocab = vocab[2:]
 
     return vocab
 
@@ -71,20 +74,26 @@ def vectorize_text(text_with_labels, vocab):
 
 
 
-# def accuracy(predicted_labels, true_labels):
-#     """
-#     predicted_labels: list of 0/1s predicted by classifier
-#     true_labels: list of 0/1s from text file
-#     return the accuracy of the predictions
-#     """
+def accuracy(predicted_labels, true_labels):
+    """
+    predicted_labels: list of 0/1s predicted by classifier
+    true_labels: list of 0/1s from text file
+    return the accuracy of the predictions
+    """
+    correct_predictions = sum(p == t for p, t in zip(predicted_labels, true_labels))
 
-#     return accuracy_score
+    total_predictions = len(predicted_labels)
+    accuracy_score = correct_predictions / total_predictions
+    return accuracy_score
+
 
 
 def main():
     # Load the training and test data
-    with open("trainingSet_test.txt", "r") as file:
+    with open("trainingSet.txt", "r") as file:
         raw_train_data = file.readlines()
+        half = len(raw_train_data) // 1  # integer division to get half
+        raw_train_data = raw_train_data[:half]  # slicing to get the first half
 
     with open("testSet.txt", "r") as file:
         raw_test_data = file.readlines()
@@ -102,24 +111,30 @@ def main():
 
     train_data, train_labels = vectorize_text(preprocessed_train_data, vocab)
 
-    print (train_data)
-    
-    print (train_labels)
+    # print (train_data)
+
+    # print (train_labels)
     test_data, test_labels = vectorize_text(preprocessed_test_data, vocab)
 
 
 
-
     # # # Initialize and train the classifier
-    # # classifier = BayesClassifier()
-    # # classifier.train(train_data, train_labels, vocab)
+    classifier_set = classifier.BayesClassifier()
+    classifier_set.train(train_data, train_labels, vocab)
+    # print("positive_word_counts:",classifier_set.positive_word_counts)
+
+    # print("negative_word_counts:", classifier_set.negative_word_counts)
+    # print("percent_positive_sentences:",classifier_set.percent_positive_sentences)
+    # print("percent_negative_sentences:",classifier_set.percent_negative_sentences)
 
     # # # Classify the test data and calculate the accuracy
-    # # predicted_labels = classifier.classify_text(test_data, vocab)
-    # # test_accuracy = accuracy(predicted_labels, test_labels)
 
-    # # # Print the test accuracy
-    # # print(f"Test Accuracy: {test_accuracy*100:.2f}%")
+
+    predicted_labels = classifier_set.classify_text(test_data, vocab)
+    test_accuracy = accuracy(predicted_labels, test_labels)
+
+    # # Print the test accuracy
+    print(f"Test Accuracy: {test_accuracy*100:.2f}%")
 
 
 
