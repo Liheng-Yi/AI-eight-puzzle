@@ -2,12 +2,14 @@
 # This file contains the processing functions
 import string
 import classifier
+import csv
 
 def process_text(text):
     text = text.lower()
     preprocessed_text = ""
 
     for i in text:
+        # only space and 0 and 1, and letters are allowed
         if ord(i) in range(97, 123) or ord(i) in (32, 48 , 49):
             preprocessed_text += i
         else:
@@ -18,58 +20,38 @@ def process_text(text):
 
 
 def build_vocab(preprocessed_text):
-    """
-    Builds the vocab from the preprocessed text
-    preprocessed_text: output from process_text
-    Returns unique text tokens
-    """
-    # Flatten the list of sentences into a list of words
-    words = [word for sentence in preprocessed_text for word in sentence]
-
-    # Get unique words
-    vocab = list(set(words))
-
-    # Sort the vocabulary
+    words = []
+    for sentence in preprocessed_text:
+        words.extend(sentence)
+    unique_words = set(words)
+    vocab = list(unique_words)
     vocab.sort()
     vocab = vocab[2:]
-
     return vocab
 
 
-
 def vectorize_text(text_with_labels, vocab):
-    """
-    Converts the text into vectors
-    text_with_labels: preprocess_text from process_text. Each element is a list of words, with the last element being the label.
-    vocab: vocab from build_vocab
-    Returns the vectorized text and the labels
-    """
 
-    # Create a dictionary that will hold the index of each word in the vocabulary
     word_index = {word: i for i, word in enumerate(vocab)}
-
-    # Initialize an empty list that will hold our vectorized sentences and labels
     vectorized_text = []
     labels = []
+    with open('result.txt', 'w', newline='') as file:
+        writer = csv.writer(file, delimiter=' ')
+        writer.writerow(vocab + ["Class Label"])  # Write headers
 
-    # Iterate over each sentence in the text
-    for sentence in text_with_labels:
-
-        # Initialize a vector for this sentence with zeros
-        vector = [0] * len(vocab)
-
-        # Iterate over each word in the sentence
-        for word in sentence[:-1]:  # Exclude the last item, which is the label
-
-            # If the word is in our vocabulary, set the corresponding position in the vector to 1
-            if word in word_index:
-                vector[word_index[word]] = 1
-
-        # Add the vector and label to our lists
-        vectorized_text.append(vector)
-        labels.append(int(sentence[-1]))  # The last item is the label
+        for sentence in text_with_labels:
+            vector = [0] * len(vocab)
+            for word in sentence[:-1]: 
+                if word in word_index:
+                    vector[word_index[word]] = 1
+            
+            vector.append(int(sentence[-1]))  # Add the label to the vector
+            writer.writerow(vector)
+            vectorized_text.append(vector[:-1])
+            labels.append(int(sentence[-1]))  
 
     return vectorized_text, labels
+
 
 
 
@@ -87,54 +69,51 @@ def accuracy(predicted_labels, true_labels):
     return accuracy_score
 
 
-
-def main():
-    # Load the training and test data
-    with open("trainingSet.txt", "r") as file:
-        raw_train_data = file.readlines()
-        half = len(raw_train_data) // 1  # integer division to get half
-        raw_train_data = raw_train_data[:half]  # slicing to get the first half
-
-    with open("testSet.txt", "r") as file:
-        raw_test_data = file.readlines()
-
-    # Preprocess the training and test data
+def test(raw_train_data, raw_test_data):
     preprocessed_train_data = [process_text(text) for text in raw_train_data]
     preprocessed_test_data = [process_text(text) for text in raw_test_data]
-
     # Build the vocabulary from the training data
     vocab = build_vocab(preprocessed_train_data)
     # print (vocab)
-
     # Vectorize the training and test data
     # print(preprocessed_train_data)
-
     train_data, train_labels = vectorize_text(preprocessed_train_data, vocab)
-
     # print (train_data)
-
     # print (train_labels)
     test_data, test_labels = vectorize_text(preprocessed_test_data, vocab)
-
-
-
     # # # Initialize and train the classifier
     classifier_set = classifier.BayesClassifier()
     classifier_set.train(train_data, train_labels, vocab)
-    # print("positive_word_counts:",classifier_set.positive_word_counts)
-
-    # print("negative_word_counts:", classifier_set.negative_word_counts)
-    # print("percent_positive_sentences:",classifier_set.percent_positive_sentences)
-    # print("percent_negative_sentences:",classifier_set.percent_negative_sentences)
-
     # # # Classify the test data and calculate the accuracy
-
-
     predicted_labels = classifier_set.classify_text(test_data, vocab)
     test_accuracy = accuracy(predicted_labels, test_labels)
 
     # # Print the test accuracy
     print(f"Test Accuracy: {test_accuracy*100:.2f}%")
+
+def main():
+    # Load the training and test data
+    with open("trainingSet.txt", "r") as file:
+        og_raw_train_data = file.readlines()
+        # part = len(raw_train_data) // 1 
+        # raw_train_data = raw_train_data[:part]  
+    with open("testSet.txt", "r") as file:
+        og_raw_test_data = file.readlines()
+
+    # Preprocess the training and test data
+    print("\n\nResults #1: \ntraining: trainingSet.txt"+
+           "\ntesting: trainingSet.txt")
+    for i in range(4,0,-1):
+        part = len(og_raw_train_data) // i
+        raw_train_data = og_raw_train_data[:part]
+        test(raw_train_data, og_raw_train_data)
+
+    print("\n\nResults #2: \ntraining: trainingSet.txt"+
+           "\ntesting: testSet.txt")
+    for i in range(4,0,-1):
+        part = len(og_raw_train_data) // i
+        raw_train_data = og_raw_train_data[:part]
+        test(raw_train_data, og_raw_test_data)
 
 
 

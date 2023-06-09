@@ -32,43 +32,52 @@ class BayesClassifier():
         self.positive_word_counts = dict.fromkeys(vocab, 0)
         self.negative_word_counts = dict.fromkeys(vocab, 0)
 
+
         for i in range(total_sentences):
             for j, word in enumerate(vocab):
                 if train_labels[i] == 1:
                     self.positive_word_counts[word] += train_data[i][j]
                 else:
                     self.negative_word_counts[word] += train_data[i][j]
-        
         return 1
-
+    
 
     def classify_text(self, vectors, vocab):
             predictions = []
-
+            # print(self.negative_word_counts)
+            # print(self.positive_word_counts)
             for vector in vectors:
-                
+
                 log_prob_positive = math.log(self.percent_positive_sentences)
                 log_prob_negative = math.log(self.percent_negative_sentences)
 
+                num_vocab = len(vocab)
+                self.delete_zero_keys(self.negative_word_counts)
+                self.delete_zero_keys(self.positive_word_counts)
                 for i in range(len(vector)):
                     
                     if vector[i] == 1: # The word is present
                         word = vocab[i]
                         if self.positive_word_counts.get(word, 0) == 0:
-                            log_prob_positive += math.log(0.1)
+
+                            log_prob_positive += math.log(1/(num_vocab+ self.percent_positive_sentences* self.file_length))
                         else:
-                            log_prob_positive += math.log(self.positive_word_counts.get(word, 1))
+                            log_prob_positive += math.log(self.positive_word_counts.get(word, 0)/len(self.positive_word_counts))
                          
                         if self.negative_word_counts.get(word, 0) == 0:
-                            log_prob_negative += math.log(0.1)
+                            log_prob_negative += math.log(1/(num_vocab + self.percent_negative_sentences* self.file_length))
                         else:
-                            log_prob_negative += math.log(self.negative_word_counts.get(word, 1))
+                            log_prob_negative += math.log(self.negative_word_counts.get(word, 0)/len(self.negative_word_counts))
                         
-
                 if log_prob_positive > log_prob_negative:
-                    predictions.append(1)  # Positive sentiment
+                    predictions.append(1) 
                 else:
-                    predictions.append(0)  # Negative sentiment
-
+                    predictions.append(0)
             return predictions
     
+
+    def delete_zero_keys(self, dictionary):
+        keys_to_delete = [key for key, value in dictionary.items() if value == 0]
+        
+        for key in keys_to_delete:
+            del dictionary[key]
